@@ -1,0 +1,146 @@
+{
+  "title": "Literature reviews in 90 seconds",
+  "voice": "af_heart",
+  "speed": 1.0,
+  "scenes": [
+    {
+      "id": 1,
+      "name": "What it is"
+    },
+    {
+      "id": 2,
+      "name": "Why you need one"
+    },
+    {
+      "id": 3,
+      "name": "Types"
+    },
+    {
+      "id": 4,
+      "name": "Systematic review"
+    },
+    {
+      "id": 5,
+      "name": "Meta-analysis"
+    },
+    {
+      "id": 6,
+      "name": "Synthesis"
+    },
+    {
+      "id": 7,
+      "name": "Review Lab"
+    }
+  ],
+  "sentences": [
+    {
+      "scene": 1,
+      "text": "A literature review is research in its own right: its data are published studies.",
+      "tts": "A literature review is research in its own right: its data are published studies."
+    },
+    {
+      "scene": 1,
+      "text": "It shows what is already known, where studies disagree, and which question is worth asking next.",
+      "tts": "It shows what is already known, where studies disagree, and which question is worth asking next.",
+      "cues": [
+        "known",
+        "disagree",
+        "question"
+      ]
+    },
+    {
+      "scene": 2,
+      "text": "Every empirical article, thesis and dissertation builds on one, and standalone reviews are published as independent studies.",
+      "tts": "Every empirical article, thesis and dissertation builds on one, and standalone reviews are published as independent studies.",
+      "cues": [
+        "empirical",
+        "thesis",
+        "dissertation",
+        "standalone"
+      ]
+    },
+    {
+      "scene": 3,
+      "text": "Reviews come in many types.",
+      "tts": "Reviews come in many types."
+    },
+    {
+      "scene": 3,
+      "text": "Narrative and critical reviews argue a position. Systematic reviews follow a protocol. Scoping reviews map a field. Bibliometric reviews chart its structure, and meta-analyses pool effect sizes.",
+      "tts": "Narrative and critical reviews argue a position. Systematic reviews follow a protocol. Scoping reviews map a field. Bibliometric reviews chart its structure, and meta-analyses pool effect sizes.",
+      "cues": [
+        "Narrative",
+        "Systematic",
+        "Scoping",
+        "Bibliometric",
+        "meta-analyses"
+      ]
+    },
+    {
+      "scene": 4,
+      "text": "A systematic review starts with a focused question and a registered protocol.",
+      "tts": "A systematic review starts with a focused question and a registered protocol.",
+      "cues": [
+        "question",
+        "protocol"
+      ]
+    },
+    {
+      "scene": 4,
+      "text": "You search several databases, remove duplicates, screen titles and abstracts, then full texts, and report every step in a PRISMA flow diagram.",
+      "tts": "You search several databases, remove duplicates, screen titles and abstracts, then full texts, and report every step in a PRISMA flow diagram.",
+      "cues": [
+        "search",
+        "duplicates",
+        "titles",
+        "full texts",
+        "PRISMA"
+      ]
+    },
+    {
+      "scene": 4,
+      "text": "Then you appraise quality, extract the data, and synthesise.",
+      "tts": "Then you appraise quality, extract the data, and synthesize.",
+      "cues": [
+        "appraise",
+        "extract",
+        "synthes"
+      ]
+    },
+    {
+      "scene": 5,
+      "text": "When studies report comparable effects, a meta-analysis combines them into one estimate, measures heterogeneity, and checks for publication bias with a funnel plot.",
+      "tts": "When studies report comparable effects, a meta-analysis combines them into one estimate, measures heterogeneity, and checks for publication bias with a funnel plot.",
+      "cues": [
+        "combines",
+        "heterogeneity",
+        "publication"
+      ]
+    },
+    {
+      "scene": 6,
+      "text": "Good synthesis works at three levels: describe what studies found, analyse how they relate, and evaluate how strong the evidence is.",
+      "tts": "Good synthesis works at three levels: describe what studies found, analyze how they relate, and evaluate how strong the evidence is.",
+      "cues": [
+        "describe",
+        "analyse",
+        "evaluate"
+      ]
+    },
+    {
+      "scene": 6,
+      "text": "From bachelor's to doctoral level, description shrinks and judgement grows.",
+      "tts": "From bachelor's to doctoral level, description shrinks and judgement grows."
+    },
+    {
+      "scene": 7,
+      "text": "Explore the review types, the 3D digital twin and the Python meta-analysis lab in Review Lab.",
+      "tts": "Explore the review types, the 3 D digital twin and the Python meta-analysis lab in Review Lab.",
+      "cues": [
+        "types",
+        "twin",
+        "Python"
+      ]
+    }
+  ]
+}

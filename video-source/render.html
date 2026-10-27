@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Review Lab video renderer</title>
+<style>
+@font-face { font-family: "Bricolage Grotesque"; src: url(../vendor/fonts/bricolage-grotesque-latin-800-normal.woff2) format("woff2"); font-weight: 800; }
+@font-face { font-family: "Bricolage Grotesque"; src: url(../vendor/fonts/bricolage-grotesque-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../vendor/fonts/atkinson-hyperlegible-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url(../vendor/fonts/atkinson-hyperlegible-latin-700-normal.woff2) format("woff2"); font-weight: 700; }
+@font-face { font-family: "Source Serif 4"; src: url(../vendor/fonts/source-serif-4-latin-400-italic.woff2) format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "JetBrains Mono"; src: url(../vendor/fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+html, body { margin: 0; background: #000; } canvas { display: block; }
+#ui { position: fixed; top: 730px; left: 0; color: #fff; font: 14px sans-serif; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1280" height="720"></canvas>
+<div id="ui"><input type="range" id="scrub" min="0" max="90" step="0.033" value="0" style="width:1000px"> <span id="tt"></span></div>
+<script>
+// Deterministic frame renderer for the Review Lab video: renderFrame(t) draws the frame at t seconds.
+const W = 1280, H = 720;
+const ctx = document.getElementById('c').getContext('2d');
+const C = { ink: '#eef1fb', ink2: '#aeb6d4', dim: '#6f789e', teal: '#42c6b0', gold: '#f2b84b', coral: '#ff7d66', violet: '#9d8cff', blue: '#5aa2ff', pink: '#e46fa8', green: '#5fc27e', panel: 'rgba(27,32,56,0.9)', line: '#34406a', d: '#5b8fe0', a: '#2fb8a2', e: '#d9628f' };
+const HEAD = '"Bricolage Grotesque", sans-serif', BODY = '"Atkinson Hyperlegible", sans-serif', MONO = '"JetBrains Mono", monospace', SERIF = '"Source Serif 4", serif';
+let TL = null;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eo = (k) => 1 - Math.pow(1 - k, 3);
+const eio = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const phi = (z) => Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+const sen = (i) => TL.sentences[i];
+function cue(i, word) { const s = sen(i); const idx = s.tts.indexOf(word); return s.start + (s.end - s.start) * (idx < 0 ? 0 : idx / s.tts.length); }
+function sceneRange(k) {
+  const first = TL.sentences.findIndex((s) => s.scene === k), next = TL.sentences.findIndex((s) => s.scene === k + 1);
+  return [k === 1 ? 0 : sen(first).start - 0.35, next < 0 ? TL.total + 1 : sen(next).start - 0.35];
+}
+function txt(s, x, y, o = {}) { const { font = BODY, size = 26, weight = 400, color = C.ink, align = 'left', alpha = 1, base = 'alphabetic', style = '' } = o; ctx.save(); ctx.globalAlpha *= alpha; ctx.font = `${style} ${weight} ${size}px ${font}`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = base; ctx.fillText(s, x, y); ctx.restore(); }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function panel(x, y, w, h, a = 1, stroke = C.line, fill = C.panel) { if (a <= 0) return; ctx.save(); ctx.globalAlpha *= a; rr(x, y, w, h, 16); ctx.fillStyle = fill; ctx.fill(); ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+function arrow(x1, y1, x2, y2, color, w = 3, a = 1, head = 12) { ctx.save(); ctx.globalAlpha *= a; ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); const an = Math.atan2(y2 - y1, x2 - x1); ctx.beginPath(); ctx.moveTo(x2, y2); ctx.lineTo(x2 - head * Math.cos(an - 0.45), y2 - head * Math.sin(an - 0.45)); ctx.lineTo(x2 - head * Math.cos(an + 0.45), y2 - head * Math.sin(an + 0.45)); ctx.closePath(); ctx.fill(); ctx.restore(); }
+function wrap(s, maxW, font) { ctx.font = font; const words = s.split(' '); const lines = []; let line = ''; for (const w of words) { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; } if (line) lines.push(line); return lines; }
+function paper(x, y, s, a = 1, rot = 0, accent = C.teal) {
+  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.rotate(rot);
+  ctx.fillStyle = '#f4f1e8'; rr(-s * 0.38, -s / 2, s * 0.76, s, 6); ctx.fill();
+  ctx.fillStyle = accent; ctx.fillRect(-s * 0.28, -s * 0.38, s * 0.4, s * 0.07);
+  ctx.fillStyle = '#b9b4a6'; for (let i = 0; i < 5; i++) ctx.fillRect(-s * 0.28, -s * 0.2 + i * s * 0.12, s * (i === 4 ? 0.3 : 0.56), s * 0.04);
+  ctx.restore();
+}
+const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+(() => { const b = bg.getContext('2d'); const g = b.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#171c34'); g.addColorStop(1, '#0d1122'); b.fillStyle = g; b.fillRect(0, 0, W, H);
+  b.strokeStyle = 'rgba(80,90,160,0.18)'; b.lineWidth = 1; const hy = 440, vx = W / 2; for (let i = -16; i <= 16; i++) { b.beginPath(); b.moveTo(vx + i * 24, hy); b.lineTo(vx + i * 160, H); b.stroke(); } for (let j = 0; j < 10; j++) { const y = hy + Math.pow(j / 9, 1.9) * (H - hy); b.beginPath(); b.moveTo(0, y); b.lineTo(W, y); b.stroke(); }
+  const v = b.createRadialGradient(W / 2, H / 2, 200, W / 2, H / 2, 820); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)'); b.fillStyle = v; b.fillRect(0, 0, W, H); })();
+
+function chrome(t) {
+  const sc = TL.sentences.reduce((acc, s) => (t >= s.start - 0.4 ? s.scene : acc), 1);
+  const name = TL.scenes.find((s) => s.id === sc).name;
+  ctx.save(); ctx.font = `600 19px ${HEAD}`; const label = `${sc} / 7  ·  ${name.toUpperCase()}`; const w = ctx.measureText(label).width + 36;
+  rr(40, 32, w, 40, 20); ctx.fillStyle = 'rgba(66,198,176,0.14)'; ctx.fill(); ctx.strokeStyle = 'rgba(66,198,176,0.65)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = C.teal; ctx.textBaseline = 'middle'; ctx.fillText(label, 58, 53); ctx.restore();
+  ctx.save(); ctx.translate(W - 232, 30); ctx.strokeStyle = C.teal; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(2, 4); ctx.lineTo(36, 4); ctx.lineTo(24, 20); ctx.lineTo(24, 32); ctx.lineTo(14, 37); ctx.lineTo(14, 20); ctx.closePath(); ctx.stroke(); ctx.restore();
+  txt('Review Lab', W - 186, 60, { font: HEAD, size: 26, weight: 800 });
+  const cur = TL.sentences.find((s) => t >= s.start - 0.15 && t <= s.end + 0.3);
+  if (cur) {
+    const a = Math.min(prog(t, cur.start - 0.15, cur.start + 0.1), 1 - prog(t, cur.end + 0.1, cur.end + 0.3));
+    const font = `400 27px ${BODY}`; const lines = wrap(cur.text, 1080, font); const lh = 37, bh = lines.length * lh + 24, by = H - 38 - bh;
+    ctx.save(); ctx.globalAlpha = a; ctx.font = font; const bw = Math.max(...lines.map((l) => ctx.measureText(l).width)) + 44;
+    rr(W / 2 - bw / 2, by, bw, bh, 14); ctx.fillStyle = 'rgba(8,10,22,0.85)'; ctx.fill(); ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    lines.forEach((l, i) => ctx.fillText(l, W / 2, by + 13 + i * lh)); ctx.restore();
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(0, H - 5, W, 5); ctx.fillStyle = C.teal; ctx.fillRect(0, H - 5, (W * t) / TL.total, 5);
+}
+
+// ---------------------------------------------------------------- scenes
+function s1(t) {
+  const a = sen(0), b = sen(1);
+  // papers stream into a funnel; the result is "evidence"
+  const fx = 640, fy = 290;
+  ctx.save(); ctx.globalAlpha *= eo(prog(t, 0.3, 1.2));
+  ctx.strokeStyle = C.teal; ctx.lineWidth = 4; ctx.fillStyle = 'rgba(66,198,176,0.12)';
+  ctx.beginPath(); ctx.moveTo(fx - 170, fy - 110); ctx.lineTo(fx + 170, fy - 110); ctx.lineTo(fx + 40, fy + 20); ctx.lineTo(fx + 40, fy + 90); ctx.lineTo(fx - 40, fy + 110); ctx.lineTo(fx - 40, fy + 20); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.restore();
+  for (let i = 0; i < 26; i++) {
+    const t0 = 0.4 + i * 0.32;
+    const k = (t - t0) / 2.2;
+    if (k < 0 || k > 1) continue;
+    const sx = 120 + ((i * 97) % 1040), sy = 120 + ((i * 53) % 60);
+    const x = lerp(sx, fx + ((i % 5) - 2) * 18, eio(Math.min(1, k * 1.3)));
+    const y = lerp(sy, fy + 40, eio(k));
+    paper(x, y, 44 * (1 - 0.6 * k), 1 - k * 0.7, (i % 3 - 1) * 0.3 * (1 - k), [C.teal, C.gold, C.violet, C.coral][i % 4]);
+  }
+  txt('published studies = your data', fx, 470, { font: SERIF, style: 'italic', size: 30, align: 'center', color: C.gold, alpha: prog(t, a.start + 2.4, a.start + 3.2) });
+  const labs = [['what is known', b.cues ? cue(1, 'known') : b.start, C.teal, 200], ['where studies disagree', cue(1, 'disagree'), C.coral, 640], ['the next question', cue(1, 'question'), C.gold, 1080]];
+  labs.forEach(([l, tc, col, x]) => {
+    const k = eo(prog(t, tc - 0.2, tc + 0.4));
+    if (k <= 0) return;
+    panel(x - 170, 505 - (1 - k) * 15, 340, 58, k, col);
+    txt(l, x, 543 - (1 - k) * 15, { font: HEAD, size: 26, weight: 600, align: 'center', color: col, alpha: k });
+  });
+}
+function s2(t) {
+  const s = sen(2);
+  txt('Why you need one', W / 2, 150, { font: HEAD, size: 44, weight: 800, align: 'center', alpha: prog(t, s.start - 0.3, s.start + 0.3) });
+  const cards = [['Empirical article', 'positions the study', 'empirical', C.blue], ['Thesis', 'builds the framework', 'thesis', C.teal], ['Dissertation', 'shows mastery of the field', 'dissertation', C.violet], ['Standalone review', 'a study in its own right', 'standalone', C.gold]];
+  cards.forEach(([h, sub, c, col], i) => {
+    const k = eo(prog(t, cue(2, c) - 0.25, cue(2, c) + 0.35));
+    if (k <= 0) return;
+    const x = 110 + i * 275, y = 230 + (1 - k) * 30;
+    panel(x, y, 245, 250, k, col);
+    ctx.save(); ctx.globalAlpha *= k;
+    for (let p = 0; p < 3; p++) paper(x + 122 + (p - 1) * 30, y + 85 + (p === 1 ? -8 : 0), 70, 1, (p - 1) * 0.18, col);
+    ctx.restore();
+    txt(h, x + 122, y + 172, { font: HEAD, size: 26, weight: 600, align: 'center', alpha: k });
+    txt(sub, x + 122, y + 206, { size: 20, color: C.ink2, align: 'center', alpha: k });
+  });
+}
+function s3(t) {
+  const s3a = sen(3), s = sen(4);
+  txt('Reviews come in many types', W / 2, 150, { font: HEAD, size: 44, weight: 800, align: 'center', alpha: prog(t, s3a.start - 0.3, s3a.start + 0.4) });
+  const types = [['Narrative & critical', 'argue a position', 'Narrative', C.gold], ['Systematic', 'follow a protocol', 'Systematic', C.teal], ['Scoping', 'map a field', 'Scoping', C.blue], ['Bibliometric', 'chart its structure', 'Bibliometric', C.violet], ['Meta-analysis', 'pools effect sizes', 'meta-analyses', C.pink]];
+  types.forEach(([h, sub, c, col], i) => {
+    const k = eo(prog(t, cue(4, c) - 0.25, cue(4, c) + 0.35));
+    if (k <= 0) return;
+    const x = 70 + i * 232, y = 225 + (1 - k) * 30;
+    panel(x, y, 212, 270, k, col);
+    ctx.save(); ctx.globalAlpha *= k; ctx.translate(x + 106, y + 95); ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    if (i === 0) { for (let l = 0; l < 4; l++) { ctx.beginPath(); ctx.moveTo(-50, -30 + l * 20); ctx.lineTo(l === 3 ? 10 : 50, -30 + l * 20); ctx.stroke(); } }
+    else if (i === 1) { [-36, -6, 24].forEach((yy, j) => { ctx.strokeRect(-40 + j * 6, yy - 10, 80 - j * 12, 22); }); }
+    else if (i === 2) { for (let r = 0; r < 4; r++) for (let q = 0; q < 5; q++) { ctx.globalAlpha = k * (0.2 + ((r * 7 + q * 3) % 5) / 6); ctx.fillRect(-55 + q * 23, -40 + r * 22, 19, 18); } ctx.globalAlpha = k; }
+    else if (i === 3) { const pts = [[-40, -25], [30, -35], [-10, 10], [45, 20], [-45, 30], [10, 40]]; ctx.lineWidth = 2; [[0, 2], [1, 2], [2, 3], [2, 4], [3, 5], [4, 5], [1, 3]].forEach(([p, q]) => { ctx.beginPath(); ctx.moveTo(...pts[p]); ctx.lineTo(...pts[q]); ctx.stroke(); }); pts.forEach(([px, py], j) => { ctx.beginPath(); ctx.arc(px, py, 6 + (j % 3) * 3, 0, 7); ctx.fill(); }); }
+    else { ctx.lineWidth = 3; for (let r = 0; r < 4; r++) { const cx = -20 + r * 14 - 15; ctx.beginPath(); ctx.moveTo(cx - 25 + r * 4, -40 + r * 18); ctx.lineTo(cx + 25 - r * 4, -40 + r * 18); ctx.stroke(); ctx.fillRect(cx - 5, -45 + r * 18, 10, 10); } ctx.beginPath(); ctx.moveTo(-30, 40); ctx.lineTo(-5, 32); ctx.lineTo(20, 40); ctx.lineTo(-5, 48); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    txt(h, x + 106, y + 200, { font: HEAD, size: 23, weight: 600, align: 'center', alpha: k });
+    txt(sub, x + 106, y + 232, { size: 19, color: C.ink2, align: 'center', alpha: k });
+  });
+}
+function s4(t) {
+  const q = sen(5), f = sen(6), z = sen(7);
+  const stages = [['Question', '', cue(5, 'question'), C.gold], ['Protocol', 'registered', cue(5, 'protocol'), C.gold], ['Search', '2,775 records', cue(6, 'search'), C.blue], ['Deduplicate', '2,279 left', cue(6, 'duplicates'), C.blue], ['Screen titles', '192 left', cue(6, 'titles'), C.teal], ['Full texts', '81 included', cue(6, 'full texts'), C.teal]];
+  txt('How a systematic review works', W / 2, 140, { font: HEAD, size: 42, weight: 800, align: 'center', alpha: prog(t, q.start - 0.3, q.start + 0.3) });
+  stages.forEach(([h, sub, tc, col], i) => {
+    const k = eo(prog(t, tc - 0.25, tc + 0.3));
+    if (k <= 0) return;
+    const x = 60 + i * 200, y = 205;
+    const hgt = i < 2 ? 150 : 150 - (i - 2) * 22;
+    panel(x, y + (150 - hgt) / 2, 170, hgt, k, col);
+    txt(h, x + 85, y + 72, { font: HEAD, size: 23, weight: 600, align: 'center', alpha: k });
+    if (sub) txt(sub, x + 85, y + 104, { font: MONO, size: 17, color: col, align: 'center', alpha: k });
+    if (i < stages.length - 1) arrow(x + 172, y + 75, x + 196, y + 75, C.dim, 3, prog(t, tc + 0.2, tc + 0.5), 9);
+  });
+  const pk = eo(prog(t, cue(6, 'PRISMA') - 0.2, cue(6, 'PRISMA') + 0.4));
+  if (pk > 0) { panel(380, 385, 520, 54, pk, C.teal, 'rgba(66,198,176,0.16)'); txt('Every step reported in a PRISMA 2020 flow diagram', 640, 420, { size: 22, weight: 700, align: 'center', color: C.teal, alpha: pk }); }
+  [['Appraise quality', 'appraise', C.coral], ['Extract data', 'extract', C.violet], ['Synthesise', 'synthes', C.gold]].forEach(([l, c, col], i) => {
+    const k = eo(prog(t, cue(7, c) - 0.2, cue(7, c) + 0.3));
+    if (k <= 0) return;
+    panel(250 + i * 270, 462, 240, 52, k, col);
+    txt(l, 370 + i * 270, 496, { font: HEAD, size: 22, weight: 600, align: 'center', color: col, alpha: k });
+  });
+}
+function s5(t) {
+  const s = sen(8);
+  txt('Meta-analysis', W / 2, 130, { font: HEAD, size: 44, weight: 800, align: 'center', alpha: prog(t, s.start - 0.3, s.start + 0.3) });
+  // forest plot
+  const st = [[0.42, 0.18], [0.18, 0.12], [0.55, 0.25], [0.30, 0.09], [0.10, 0.15], [0.38, 0.2], [0.25, 0.08]];
+  const x0 = 120, x1 = 640, X = (v) => x0 + 70 + ((v + 0.3) / 1.3) * (x1 - x0 - 90);
+  panel(x0 - 20, 175, x1 - x0 + 40, 330, prog(t, s.start, s.start + 0.4));
+  ctx.save(); ctx.globalAlpha *= prog(t, s.start, s.start + 0.4);
+  ctx.strokeStyle = C.dim; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(X(0), 195); ctx.lineTo(X(0), 470); ctx.stroke(); ctx.setLineDash([]);
+  st.forEach(([e, se], i) => { const k = prog(t, s.start + 0.3 + i * 0.35, s.start + 0.6 + i * 0.35); if (k <= 0) return; const y = 210 + i * 32; ctx.globalAlpha = k; ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X(e - 1.96 * se), y); ctx.lineTo(X(e + 1.96 * se), y); ctx.stroke(); ctx.fillStyle = C.teal; const sz = 8 + 0.6 / se; ctx.fillRect(X(e) - sz / 2, y - sz / 2, sz, sz); txt(`Study ${i + 1}`, x0, y + 6, { size: 17, color: C.ink2 }); });
+  ctx.restore();
+  const dk = eo(prog(t, cue(8, 'combines') - 0.2, cue(8, 'combines') + 0.5));
+  if (dk > 0) { const y = 450, e = 0.29, lo = 0.2, hi = 0.38; ctx.save(); ctx.globalAlpha = dk; ctx.fillStyle = C.gold; ctx.beginPath(); ctx.moveTo(X(lo), y); ctx.lineTo(X(e), y - 12); ctx.lineTo(X(hi), y); ctx.lineTo(X(e), y + 12); ctx.closePath(); ctx.fill(); ctx.restore(); txt('pooled estimate', X(hi) + 14, y + 7, { size: 18, weight: 700, color: C.gold, alpha: dk }); }
+  const hk = eo(prog(t, cue(8, 'heterogeneity') - 0.2, cue(8, 'heterogeneity') + 0.4));
+  if (hk > 0) { panel(x0 - 20, 520, x1 - x0 + 40, 0.01, 0); txt('heterogeneity: I² · τ² · prediction interval', (x0 + x1) / 2, 492, { size: 18, color: C.coral, align: 'center', alpha: hk }); }
+  // funnel
+  const fk = eo(prog(t, cue(8, 'publication') - 0.3, cue(8, 'publication') + 0.5));
+  if (fk > 0) {
+    panel(700, 175, 470, 330, fk);
+    ctx.save(); ctx.globalAlpha *= fk;
+    const cx = 935, top = 205, bot = 465;
+    ctx.fillStyle = 'rgba(66,198,176,0.14)'; ctx.strokeStyle = C.teal; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx - 200, bot); ctx.lineTo(cx + 200, bot); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.setLineDash([]);
+    const pts = [[0.2, 0.1], [0.35, 0.15], [0.3, 0.3], [0.5, 0.45], [0.25, 0.2], [0.7, 0.6], [0.45, 0.35], [0.85, 0.75], [0.6, 0.55], [0.15, 0.05]];
+    pts.forEach(([e, s2]) => { ctx.fillStyle = C.teal; ctx.beginPath(); ctx.arc(cx + (e - 0.3) * 260, top + s2 * 250, 7, 0, 7); ctx.fill(); });
+    [[-0.1, 0.6], [-0.25, 0.75], [0.0, 0.5]].forEach(([e, s2]) => { ctx.strokeStyle = C.coral; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx + (e - 0.3) * 260, top + s2 * 250, 7, 0, 7); ctx.stroke(); });
+    ctx.restore();
+    txt('missing small studies?', 760, 492, { size: 18, color: C.coral, weight: 700, alpha: fk });
+  }
+}
+function s6(t) {
+  const a = sen(9), b = sen(10);
+  txt('Writing synthesis', W / 2, 130, { font: HEAD, size: 44, weight: 800, align: 'center', alpha: prog(t, a.start - 0.3, a.start + 0.3) });
+  const levels = [['Describe', 'what did studies find?', 'describe', C.d], ['Analyse', 'how do they relate, and why?', 'analyse', C.a], ['Evaluate', 'how strong is the evidence?', 'evaluate', C.e]];
+  const out = eio(prog(t, b.start - 0.4, b.start + 0.3));
+  levels.forEach(([h, q, c, col], i) => {
+    const k = eo(prog(t, cue(9, c) - 0.25, cue(9, c) + 0.35)) * (1 - out);
+    if (k <= 0) return;
+    const x = 200 + i * 120, y = 420 - i * 95;
+    panel(x, y, 640, 80, k, col);
+    ctx.save(); ctx.globalAlpha *= k; ctx.fillStyle = col; rr(x + 16, y + 16, 48, 48, 10); ctx.fill(); ctx.restore();
+    txt(h[0], x + 40, y + 50, { font: HEAD, size: 28, weight: 800, align: 'center', color: '#0d1122', alpha: k });
+    txt(h, x + 84, y + 38, { font: HEAD, size: 26, weight: 600, color: col, alpha: k });
+    txt(q, x + 84, y + 66, { size: 19, color: C.ink2, alpha: k });
+  });
+  if (out > 0) {
+    const mix = [["Bachelor's", 45, 40, 15], ["Master's", 30, 45, 25], ['PhD', 20, 45, 35], ['Researcher', 15, 45, 40]];
+    mix.forEach(([l, d, an, e], i) => {
+      const k = eo(prog(t, b.start + i * 0.5, b.start + i * 0.5 + 0.5)) * out;
+      if (k <= 0) return;
+      const y = 200 + i * 78, x = 330, w = 720;
+      txt(l, x - 20, y + 32, { font: HEAD, size: 24, weight: 600, align: 'right', alpha: k });
+      let cx = x;
+      [[d, C.d, 'D'], [an, C.a, 'A'], [e, C.e, 'E']].forEach(([v, col, lab]) => { const ww = (w * v / 100) * k; ctx.save(); ctx.globalAlpha *= k; ctx.fillStyle = col; ctx.fillRect(cx, y + 6, ww, 40); ctx.restore(); if (ww > 60) txt(`${lab} ${v}%`, cx + ww / 2, y + 33, { size: 18, weight: 700, color: '#0d1122', align: 'center', alpha: k }); cx += ww; });
+    });
+    txt('description shrinks, judgement grows', W / 2, 540, { font: SERIF, style: 'italic', size: 28, color: C.gold, align: 'center', alpha: prog(t, b.start + 2.2, b.start + 2.8) });
+  }
+}
+function s7(t) {
+  const s = sen(11);
+  const items = [['Review types & finder', 'types', C.gold], ['3D digital twin', 'twin', C.teal], ['Python meta-analysis lab', 'Python', C.violet]];
+  ctx.save(); ctx.translate(W / 2 - 34, 120); ctx.strokeStyle = C.teal; ctx.lineWidth = 7; ctx.lineJoin = 'round';
+  const k0 = eo(prog(t, s.start - 0.3, s.start + 0.6)); ctx.globalAlpha = k0;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(68, 0); ctx.lineTo(44, 32); ctx.lineTo(44, 56); ctx.lineTo(24, 66); ctx.lineTo(24, 32); ctx.closePath(); ctx.stroke(); ctx.restore();
+  txt('Review Lab', W / 2, 262, { font: HEAD, size: 64, weight: 800, align: 'center', alpha: k0 });
+  txt('literature reviews, explained by doing', W / 2, 304, { font: SERIF, style: 'italic', size: 26, color: C.ink2, align: 'center', alpha: k0 });
+  items.forEach(([l, c, col], i) => { const k = eo(prog(t, cue(11, c) - 0.2, cue(11, c) + 0.4)); if (k <= 0) return; panel(160 + i * 330, 340, 300, 62, k, col); txt(l, 310 + i * 330, 379, { font: HEAD, size: 23, weight: 600, color: col, align: 'center', alpha: k }); });
+  const uk = prog(t, s.end - 0.6, s.end + 0.2);
+  txt('rajan56.github.io/LiteratureReview-Explained', W / 2, 470, { font: MONO, size: 30, color: C.gold, align: 'center', alpha: uk });
+  txt('Narration: Kokoro-82M (Apache 2.0) · No music · Free to use for teaching', W / 2, 560, { size: 17, color: C.dim, align: 'center', alpha: prog(t, s.end, s.end + 0.8) });
+}
+const SCENES = [s1, s2, s3, s4, s5, s6, s7];
+function renderFrame(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.drawImage(bg, 0, 0);
+  for (let k = 1; k <= SCENES.length; k++) {
+    const [a, b] = sceneRange(k);
+    if (t < a - 0.01 || t > b + 0.35) continue;
+    const al = k === 1 ? 1 - prog(t, b, b + 0.35) : Math.min(prog(t, a, a + 0.35), k === SCENES.length ? 1 : 1 - prog(t, b, b + 0.35));
+    if (al <= 0) continue;
+    ctx.save(); ctx.globalAlpha = al; SCENES[k - 1](t); ctx.restore();
+  }
+  const f = Math.min(prog(t, 0, 0.5), 1 - prog(t, TL.total - 0.6, TL.total));
+  chrome(t);
+  if (f < 1) { ctx.save(); ctx.globalAlpha = 1 - f; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+}
+window.ready = (async () => {
+  TL = await (await fetch('build/timeline.json')).json();
+  for (const f of [`800 40px ${HEAD}`, `600 40px ${HEAD}`, `400 20px ${BODY}`, `700 20px ${BODY}`, `500 20px ${MONO}`, `italic 400 20px ${SERIF}`]) await document.fonts.load(f);
+  renderFrame(0);
+  const sc = document.getElementById('scrub'), tt = document.getElementById('tt');
+  sc.addEventListener('input', () => { renderFrame(+sc.value); tt.textContent = (+sc.value).toFixed(2) + ' s'; });
+  window.renderFrame = renderFrame;
+  return true;
+})();
+</script>
+</body>
+</html>

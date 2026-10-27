@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Lab: Literature Reviews, Systematic Reviews and Meta-Analysis</title>
+<meta name="description" content="An interactive learning platform and 3D digital twin for literature reviews: review types, which review to choose, how each is done, a systematic review simulator with PRISMA 2020, a Python meta-analysis lab, academic synthesis writing, and tools. For bachelor's, master's, PhD students and researchers.">
+<meta name="theme-color" content="#0f1424">
+<link rel="preload" href="vendor/fonts/bricolage-grotesque-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/fonts/source-serif-4-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="src/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f1424'/%3E%3Cpath d='M12 14h40l-14 18v14l-12 6V32z' fill='none' stroke='%2342c6b0' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body data-level="master">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top"><svg viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0f1424"/><path d="M12 14h40l-14 18v14l-12 6V32z" fill="none" stroke="#42c6b0" stroke-width="5" stroke-linejoin="round"/></svg><span>Review Lab</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#basics">Basics</a><a href="#paths">Paths</a><a href="#types">Types</a><a href="#finder">Finder</a><a href="#howto">How-to</a><a href="#twin">Twin</a><a href="#meta">Meta</a><a href="#writing">Writing</a><a href="#analysis">Analysis</a><a href="#tools">Tools</a><a href="#python">Python</a><a href="#video">Video</a><a href="#references">Refs</a>
+    </nav>
+    <fieldset class="levels" aria-label="I am a">
+      <legend class="sr-only">Show guidance for</legend>
+      <label><input type="radio" name="level" value="bachelor"><span>Bachelor's</span></label>
+      <label><input type="radio" name="level" value="master" checked><span>Master's</span></label>
+      <label><input type="radio" name="level" value="phd"><span>PhD</span></label>
+      <label><input type="radio" name="level" value="researcher"><span>Researcher</span></label>
+    </fieldset>
+  </div>
+</header>
+
+<main id="main">
+<!-- ================================================================ HERO -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">Learning platform · 3D digital twin · Python engine</p>
+      <h1>Review Lab: how to plan, run and write a literature review</h1>
+      <p class="lead">From a bachelor's thesis chapter to a publishable meta-analysis. Learn the review types and when to use each, simulate a systematic review in a 3D digital twin, run a real meta-analysis in Python inside your browser, and practise the academic voice of synthesis.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#finder">Find the right review for my project</a>
+        <a class="btn" href="#twin">Open the 3D digital twin</a>
+        <a class="btn btn-ghost" href="#video">Watch the 90-second video</a>
+      </div>
+      <ul class="hero-stats" aria-label="What is inside">
+        <li><b>17</b> review types explained</li><li><b>4</b> learning paths</li><li><b>3</b> simulators</li><li><b>90+</b> academic references</li>
+      </ul>
+    </div>
+    <aside class="def-card" aria-labelledby="defH">
+      <h2 id="defH">A literature review is…</h2>
+      <blockquote>“a study that analyzes and synthesizes an existing body of literature by identifying, challenging, and advancing the building blocks of a theory through an examination of a body (or several bodies) of prior work”</blockquote>
+      <p class="src">Post et al. (2020, p. 352), as quoted in <a class="cite" href="#ref-kraus2022">Kraus et al. (2022)</a></p>
+      <p>In practice it is <b>secondary research</b>: the data are published studies, and the method is how you find, select, appraise and synthesise them.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ================================================================ BASICS -->
+<section id="basics" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">1 · Foundations</p><h2>Why every research project needs a literature review</h2>
+      <p class="sub">A review is not a formality before the "real" research. It decides which question is worth asking, which theory and methods are credible, and what your contribution can be <span data-cite="boote2005,snyder2019"></span>.</p></header>
+    <div class="why-grid">
+      <article class="why-card"><span class="why-n">A</span><h3>Empirical research article</h3><p>The review section positions the study: it defines constructs, justifies hypotheses or propositions from prior evidence, and shows the gap the study fills. Typically compact and argument-led.</p></article>
+      <article class="why-card"><span class="why-n">B</span><h3>Bachelor's or master's thesis</h3><p>Shows you can find, organise and critically connect the literature, and derive a framework and research questions from it. Examiners look for synthesis, not summaries.</p></article>
+      <article class="why-card"><span class="why-n">C</span><h3>Doctoral dissertation</h3><p>Demonstrates mastery of the field, its theories and methods; Boote and Beile (2005) call it the foundation of being a "scholar before researcher". Often one chapter becomes a published systematic review <span data-cite="pickering2014"></span>.</p></article>
+      <article class="why-card"><span class="why-n">D</span><h3>Standalone review article</h3><p>A study in its own right: it can provide an overview of current knowledge, evaluate how knowledge has progressed, and propose pathways to advance it <span data-cite="lim2022,kraus2022"></span>. Many journals publish only reviews.</p></article>
+    </div>
+
+    <div class="frame">
+      <div class="frame-h"><h3>Five fundamental elements of a review as an independent study</h3><p class="sub">Frame from <a class="cite" href="#ref-kraus2022">Kraus et al. (2022)</a>. Select an element.</p></div>
+      <div class="frame-body">
+        <div class="pent" role="tablist" aria-label="Five elements">
+          <button role="tab" class="pent-b" data-el="types" aria-selected="true">Types</button>
+          <button role="tab" class="pent-b" data-el="focuses" aria-selected="false">Focuses</button>
+          <button role="tab" class="pent-b" data-el="considerations" aria-selected="false">Considerations</button>
+          <button role="tab" class="pent-b" data-el="methods" aria-selected="false">Methods</button>
+          <button role="tab" class="pent-b" data-el="contributions" aria-selected="false">Contributions</button>
+        </div>
+        <div class="pent-panel" id="pentPanel" role="tabpanel" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ PATHS -->
+<section id="paths" class="sec sec-alt">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">2 · Learning paths</p><h2>What is expected at your level</h2>
+      <p class="sub">Choose a tab (it also sets the level used by the finder and the writing analyser). Ranges are typical, not rules: your programme or journal always has the final word.</p></header>
+    <div class="tabs" role="tablist" aria-label="Learning paths" id="pathTabs"></div>
+    <div class="path-panel" id="pathPanel" role="tabpanel"></div>
+  </div>
+</section>
+
+<!-- ================================================================ TYPES -->
+<section id="types" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">3 · Review types</p><h2>An atlas of 17 review types</h2>
+      <p class="sub">Each type is characterised by how it searches, appraises, synthesises and analyses (SALSA) <span data-cite="grant2009"></span>. At the broadest level there are systematic and non-systematic reviews; the names below describe recognisable variants <span data-cite="kraus2022,pare2015,snyder2019"></span>.</p></header>
+    <div class="filters" role="group" aria-label="Filter review types" id="typeFilters"></div>
+    <div class="atlas" id="atlas"></div>
+    <div class="type-detail" id="typeDetail" tabindex="-1" aria-live="polite"></div>
+    <details class="salsa"><summary>Compare all types side by side (SALSA matrix)</summary><div class="table-wrap"><table class="matrix" id="salsa"></table></div></details>
+  </div>
+</section>
+
+<!-- ================================================================ FINDER -->
+<section id="finder" class="sec sec-alt">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">4 · Decision support</p><h2>Which review does my project need?</h2>
+      <p class="sub">Answer six questions. The finder scores every review type against your aim, evidence, field size, time, team and output, and explains its reasoning.</p></header>
+    <div class="finder">
+      <form class="finder-q" id="finderForm" onsubmit="return false"></form>
+      <div class="finder-out" id="finderOut" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ HOWTO -->
+<section id="howto" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">5 · Procedures</p><h2>How each type of review is done</h2>
+      <p class="sub">Pick a review type to see its stages, what to do at each one, and the usual tools.</p></header>
+    <label class="field-inline">Review type <select id="howSelect"></select></label>
+    <ol class="steps" id="howSteps"></ol>
+    <div class="qframes">
+      <h3>Framing the question</h3>
+      <div class="table-wrap"><table class="mini">
+        <thead><tr><th>Framework</th><th>Elements</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td>PICO / PICOS</td><td>Population, Intervention, Comparison, Outcome (Study design)</td><td>Effectiveness questions, meta-analysis <span data-cite="higgins2023"></span></td></tr>
+          <tr><td>PICOC</td><td>Population, Intervention, Comparison, Outcome, Context</td><td>Management and social science SLRs <span data-cite="petticrew2006"></span></td></tr>
+          <tr><td>SPIDER</td><td>Sample, Phenomenon of Interest, Design, Evaluation, Research type</td><td>Qualitative and mixed-methods syntheses <span data-cite="methley2014"></span></td></tr>
+          <tr><td>SPICE</td><td>Setting, Perspective, Intervention, Comparison, Evaluation</td><td>Service, policy and library questions <span data-cite="booth2006"></span></td></tr>
+          <tr><td>PCC</td><td>Population, Concept, Context</td><td>Scoping reviews <span data-cite="peters2020"></span></td></tr>
+        </tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ TWIN -->
+<section id="twin" class="sec sec-dark">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">6 · Digital twin</p><h2>A 3D digital twin of a systematic review</h2>
+      <p class="sub">The review is modelled as a production line. Every decision you make (databases, search string, filters, screening strategy, team) propagates through the stations: records flow on the conveyor, rejected records drop into bins in the true proportions, and the dashboard predicts recall, workload, bottleneck and completion time. Switch on timeline mode to replay the project week by week.</p></header>
+
+    <div class="twin-grid">
+      <form class="tw-panel" id="twForm" onsubmit="return false" aria-label="Digital twin settings">
+        <p class="tw-h">Scenario presets</p>
+        <div class="preset-row" id="twPresets"></div>
+
+        <fieldset><legend>The field</legend>
+          <label class="sl">Truly relevant studies <output id="twROut"></output><input type="range" id="twR" min="20" max="600" step="10"></label>
+          <label class="sel">Vocabulary noise <select id="twNoise"><option value="low">Low (precise terms)</option><option value="medium">Medium</option><option value="high">High (ambiguous terms)</option></select></label>
+        </fieldset>
+        <fieldset><legend>Databases</legend><div class="dbs" id="twDbs"></div></fieldset>
+        <fieldset><legend>Search string</legend>
+          <label class="sl">Synonyms per concept <output id="twSynOut"></output><input type="range" id="twSyn" min="1" max="8" step="1"></label>
+          <label class="sl">Concept blocks joined by AND <output id="twBlocksOut"></output><input type="range" id="twBlocks" min="1" max="4" step="1"></label>
+          <label class="sel">Search field <select id="twField"><option value="ti">Title only</option><option value="tak">Title, abstract, keywords</option><option value="all">All fields / full text</option></select></label>
+          <label class="sel">Years <select id="twYears"><option value="all">All years</option><option value="20">Last 20 years</option><option value="10">Last 10 years</option></select></label>
+          <label class="ck"><input type="checkbox" id="twEnglish"> English only</label>
+          <label class="ck"><input type="checkbox" id="twPeer"> Peer-reviewed journal articles only</label>
+          <label class="ck"><input type="checkbox" id="twBack"> Backward snowballing</label>
+          <label class="ck"><input type="checkbox" id="twFwd"> Forward snowballing</label>
+        </fieldset>
+        <fieldset><legend>Screening and appraisal</legend>
+          <label class="sel">Screening strategy <select id="twStrategy"><option value="single">Single screener</option><option value="single_check">Single + 20% checked by a second reviewer</option><option value="dual">Dual independent screening</option><option value="ai">AI-prioritised screening with stopping rule</option></select></label>
+          <label class="sl">Strictness of criteria <output id="twStrictOut"></output><input type="range" id="twStrict" min="0" max="1" step="0.05"></label>
+          <label class="sl">Expected agreement (Cohen's κ) <output id="twKappaOut"></output><input type="range" id="twKappa" min="0.3" max="0.95" step="0.05"></label>
+          <label class="sl">Full texts obtainable <output id="twAccessOut"></output><input type="range" id="twAccess" min="0.6" max="1" step="0.01"></label>
+          <label class="sl">Exclude lowest-quality studies <output id="twCutOut"></output><input type="range" id="twCut" min="0" max="0.4" step="0.05"></label>
+        </fieldset>
+        <fieldset><legend>Team and effort</legend>
+          <label class="sl">Reviewers <output id="twReviewersOut"></output><input type="range" id="twReviewers" min="1" max="6" step="1"></label>
+          <label class="sl">Hours per reviewer per week <output id="twHoursOut"></output><input type="range" id="twHours" min="2" max="40" step="1"></label>
+          <details class="effort"><summary>Time per task</summary>
+            <label class="sl">Per abstract <output id="twSecTAOut"></output><input type="range" id="twSecTA" min="10" max="90" step="5"></label>
+            <label class="sl">Per full text <output id="twMinFTOut"></output><input type="range" id="twMinFT" min="5" max="45" step="1"></label>
+            <label class="sl">Extraction per study <output id="twMinExOut"></output><input type="range" id="twMinEx" min="15" max="120" step="5"></label>
+          </details>
+        </fieldset>
+      </form>
+
+      <div class="tw-main">
+        <div class="stage3d" id="twStage" role="img" aria-label="3D production line of the review: search, deduplicate, title and abstract screening, full-text retrieval, eligibility, appraisal, extraction and synthesis stations. The dashboard and diagrams below give the same information as text.">
+          <div class="st-legend" aria-hidden="true"><span><i class="lg lg-ok"></i>active</span><span><i class="lg lg-bad"></i>bottleneck</span><span><i class="lg lg-done"></i>done</span><span><i class="lg lg-idle"></i>waiting</span><span><i class="lg lg-bin"></i>bins: excluded records</span></div>
+          <div class="st-tools" role="group" aria-label="3D view">
+            <button type="button" class="chip" data-tw-view="angle">Overview</button><button type="button" class="chip" data-tw-view="start">Search end</button><button type="button" class="chip" data-tw-view="front">Front</button><button type="button" class="chip" data-tw-view="top">Top</button>
+            <button type="button" class="chip chip-hi" id="twMode" aria-pressed="false">Timeline mode: off</button>
+          </div>
+        </div>
+        <div class="tw-timeline" id="twTimeline" hidden>
+          <button type="button" class="btn btn-small" id="twPlay">Play</button>
+          <input type="range" id="twWeek" min="0" max="10" step="0.05" value="0" aria-label="Project week">
+          <output id="twWeekOut" class="mono"></output>
+        </div>
+        <p class="sr-only" id="twLive" aria-live="polite"></p>
+        <div class="kpis" id="twKpis"></div>
+        <div class="tw-row">
+          <figure class="tw-card"><figcaption>PRISMA 2020 flow diagram (live)</figcaption><div id="twPrisma" class="svgbox"></div></figure>
+          <div class="tw-side">
+            <figure class="tw-card"><figcaption>Project timeline and workload</figcaption><div id="twGantt" class="svgbox"></div></figure>
+            <div class="tw-card"><p class="tw-h">Twin advisor</p><ul class="advice" id="twAdvice"></ul></div>
+          </div>
+        </div>
+        <div class="tw-row2">
+          <div class="tw-card"><p class="tw-h">Example Scopus query generated from your settings</p><pre class="code" id="twString"></pre><p class="hint">Topic used for the example: remote work and productivity. Asterisks (*) truncate, quotes force phrases, OR widens within a concept, AND narrows across concepts.</p></div>
+          <details class="tw-card"><summary class="tw-h">Model assumptions (open and adjustable)</summary><div class="table-wrap"><table class="mini assumptions"><tbody id="twAssumptions"></tbody></table></div><p class="hint">This is a teaching model: values are plausible orders of magnitude chosen to show how decisions interact, not estimates for a specific topic.</p></details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ META -->
+<section id="meta" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">7 · Meta-analysis</p><h2>Meta-analysis: combining effect sizes, in detail</h2>
+      <p class="sub">A meta-analysis is the statistical part of a systematic review: it pools comparable effect sizes into one estimate, measures how much studies disagree, and tests whether the picture is distorted <span data-cite="glass1976,hedges1985,borenstein2021,cooper2017"></span>. All analyses below run in real Python in your browser.</p></header>
+    <div class="py-status" data-py-status><span class="dot"></span><span class="txt">Python engine not loaded yet</span><button type="button" class="btn btn-small" data-py-load>Load Python engine</button></div>
+
+    <div class="learn-grid">
+      <article class="learn"><h3>When to meta-analyse</h3><ul><li>Studies address the same question with comparable designs, populations and outcomes.</li><li>Each study reports an effect size or the statistics to compute one (means and SDs, events, correlations).</li><li>You have at least two studies, and in practice enough to estimate heterogeneity meaningfully.</li></ul><h4>When not to</h4><ul><li>Studies are conceptually too different ("apples and oranges").</li><li>Outcomes are measured in incompatible ways or effect sizes cannot be derived.</li><li>Evidence is at high risk of bias: pooling biased studies gives a precise wrong answer. Use a structured narrative synthesis (SWiM) instead <span data-cite="campbell2020"></span>.</li></ul></article>
+      <article class="learn"><h3>Effect sizes</h3><ul><li><b>Standardised mean difference</b> (Hedges' g) for two-group comparisons on continuous outcomes, with small-sample correction <span data-cite="hedges1981"></span>.</li><li><b>Log risk ratio / log odds ratio</b> for binary outcomes.</li><li><b>Correlation r</b>, pooled on Fisher's z and transformed back.</li><li>Rough benchmarks for g: 0.2 small, 0.5 medium, 0.8 large <span data-cite="cohen1988"></span>; judge against your field.</li></ul></article>
+      <article class="learn"><h3>Fixed (common) vs random effects</h3><p>A common-effect model assumes one true effect; differences are sampling error. A random-effects model assumes true effects vary across settings with variance τ², which is usually more realistic in social and management research <span data-cite="borenstein2021"></span>. The classic DerSimonian-Laird estimator <span data-cite="dersimonian1986"></span> is simple, while REML estimates τ² better <span data-cite="viechtbauer2005"></span>; the Hartung-Knapp adjustment gives more honest confidence intervals, especially with few studies <span data-cite="knapp2003,inthout2014"></span>.</p></article>
+      <article class="learn"><h3>Heterogeneity</h3><p><b>Q</b> tests whether studies differ more than chance; <b>I²</b> is the share of variability due to real differences; <b>τ²</b> is the variance of true effects; the <b>prediction interval</b> shows where the effect in a new setting would fall <span data-cite="higgins2002,higgins2003,riley2011"></span>. Explore it with subgroups and meta-regression on moderators coded during extraction.</p></article>
+      <article class="learn"><h3>Publication bias and small-study effects</h3><p>Significant results are more likely to be published <span data-cite="rosenthal1979"></span>. Inspect the funnel plot, test asymmetry with Egger's regression <span data-cite="egger1997"></span>, and use trim-and-fill as a sensitivity analysis <span data-cite="duval2000"></span>. Best protection: search grey literature, registries and preprints.</p></article>
+      <article class="learn"><h3>Robustness and certainty</h3><p>Leave-one-out and cumulative analyses show whether one study drives the result. Rate risk of bias with RoB 2 or ROBINS-I <span data-cite="sterne2019,sterne2016"></span> and the overall certainty of evidence with GRADE <span data-cite="guyatt2008"></span>. Report with PRISMA 2020 <span data-cite="page2021"></span>.</p></article>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>Tool 1 · Meta-analysis calculator</h3><p class="hint" id="maStatus" aria-live="polite"></p></div>
+      <div class="tool-bar">
+        <label class="field-inline">Dataset <select id="maData"></select></label>
+        <label class="field-inline">Model <select id="maModel"><option value="REML">Random effects (REML)</option><option value="DL">Random effects (DerSimonian-Laird)</option><option value="FE">Common (fixed) effect</option></select></label>
+        <label class="ck"><input type="checkbox" id="maHksj"> Hartung-Knapp CI</label>
+        <button type="button" class="btn btn-primary btn-small" id="maRun">Run analysis</button>
+        <button type="button" class="btn btn-small" id="maAdd">Add study</button>
+        <button type="button" class="btn btn-small" id="maCsv">Download CSV</button>
+      </div>
+      <p class="hint" id="maNote"></p>
+      <details class="data-details" open><summary>Study data (edit any cell)</summary><div class="table-wrap"><table class="data-table" id="maTable"></table></div></details>
+      <div id="maOut" class="ma-out"><p class="hint">Results appear here once the Python engine has loaded.</p></div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>Tool 2 · "What if?" publication-bias and heterogeneity simulator</h3><p class="hint" id="siStatus" aria-live="polite"></p></div>
+      <p>Create a literature where you know the truth, let journals filter it, and see what a meta-analysis of the published studies would conclude.</p>
+      <div class="scn-row" role="group" aria-label="Scenarios">
+        <button type="button" class="chip-btn" data-scn="clean">No bias</button><button type="button" class="chip-btn" data-scn="bias">Strong publication bias</button><button type="button" class="chip-btn" data-scn="zero">Null effect + bias</button><button type="button" class="chip-btn" data-scn="hetero">High heterogeneity</button><button type="button" class="chip-btn" data-scn="small">Only small studies</button>
+      </div>
+      <p class="question" id="siQuestion"></p>
+      <div class="sim-grid">
+        <div class="sim-ctrl">
+          <label class="sl">True mean effect <output id="siMuOut"></output><input type="range" id="siMu" min="-0.2" max="0.8" step="0.05" value="0.2"></label>
+          <label class="sl">Between-study SD <output id="siTauOut"></output><input type="range" id="siTau" min="0" max="0.5" step="0.01" value="0.05"></label>
+          <label class="sl">Published studies <output id="siKOut"></output><input type="range" id="siK" min="5" max="60" step="1" value="25"></label>
+          <label class="sl">Publication bias <output id="siBiasOut"></output><input type="range" id="siBias" min="0" max="0.95" step="0.05" value="0.8"></label>
+          <label class="sl">Study size <output id="siNmaxOut"></output><input type="range" id="siNmax" min="30" max="400" step="10" value="200"></label>
+          <label class="ck"><input type="checkbox" id="siDrawer" checked> Show the file drawer (unpublished)</label>
+          <div class="row-btns"><button type="button" class="btn btn-primary btn-small" id="siRun">Run simulation</button><button type="button" class="btn btn-small" id="siSeed">New random literature</button></div>
+        </div>
+        <div><div class="kpis kpis-sm" id="siCards"></div><figure class="plot-card"><div id="siPlot" class="svgbox"></div></figure><p class="lesson" id="siLesson"></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ WRITING -->
+<section id="writing" class="sec sec-alt">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">8 · Academic writing</p><h2>Synthesis: descriptive, analytical and evaluative writing</h2>
+      <p class="sub">Synthesis means combining sources into an argument, not reporting them one by one <span data-cite="webster2002,torraco2016"></span>. Academic review writing moves through three levels, which mirror the higher levels of Bloom's revised taxonomy (analyse, evaluate, create) <span data-cite="anderson2001,wallace2021"></span>.</p></header>
+    <div class="lv-grid" id="levelCards"></div>
+
+    <div class="ladder">
+      <h3>One topic, three levels</h3>
+      <ol class="ladder-l" id="ladder"></ol>
+    </div>
+
+    <div class="mix">
+      <div><h3>How much of each, and why?</h3><p>The balance depends on the type of review and on your level. Treat the proportions as teaching guidance derived from what each type is for, not as fixed rules.</p>
+        <div id="mixType"></div></div>
+      <div><h3>By academic level</h3><p>As you progress, description shrinks and judgement grows, because examiners and reviewers increasingly expect you to take a position.</p><div id="mixLevel"></div></div>
+    </div>
+
+    <div class="opening">
+      <h3>Open the analysis section by declaring your synthesis levels</h3>
+      <p>Readers and examiners should know, before the findings, how you will synthesise and why. A model opening paragraph:</p>
+      <blockquote class="template" id="openTemplate"></blockquote>
+      <p class="hint">Adapt section numbers, counts and appraisal tool. The point is to name each level, say where it happens, and justify its share.</p>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>Tool 3 · Synthesis analyser (Python)</h3><div class="py-status py-mini" data-py-status><span class="dot"></span><span class="txt"></span></div></div>
+      <p>Paste a paragraph from your review. The analyser labels each sentence as descriptive, analytical or evaluative using signal phrases and compares the profile with the target for your level. It is a heuristic guide for self-checking, not a grade.</p>
+      <div class="an-grid">
+        <div>
+          <div class="row-btns"><button type="button" class="chip-btn" data-sample="descriptive">Sample: mostly descriptive</button><button type="button" class="chip-btn" data-sample="balanced">Sample: balanced</button><button type="button" class="chip-btn" data-sample="evaluative">Sample: evaluative</button></div>
+          <label for="anText" class="sr-only">Paragraph to analyse</label>
+          <textarea id="anText" rows="9"></textarea>
+          <div class="row-btns"><label class="field-inline">Target level <select id="anLevel"><option value="bachelor">Bachelor's</option><option value="master" selected>Master's</option><option value="phd">PhD</option><option value="researcher">Researcher</option></select></label><button type="button" class="btn btn-primary btn-small" id="anRun">Analyse</button></div>
+        </div>
+        <div id="anOut" aria-live="polite"><p class="hint">Results appear here.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ ANALYSIS -->
+<section id="analysis" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">9 · Analysing secondary data</p><h2>From a pile of papers to findings</h2>
+      <p class="sub">In a review, the included studies are your data. Analysis means extracting, coding and relating them, using objective methods (bibliometrics, counts), subjective methods (thematic and critical analysis), or both <span data-cite="kraus2022"></span>.</p></header>
+
+    <div class="learn-grid">
+      <article class="learn"><h3>1. Extraction form</h3><p>Pilot a form on 3–5 studies, then extract consistently: citation, country and sector, sample, design, theory, constructs and measures, key findings, limitations, quality score. Double-extract a sample to check reliability.</p></article>
+      <article class="learn"><h3>2. Coding</h3><p><b>Deductive</b>: codes come from a framework (e.g., TCCM, ADO) chosen in advance <span data-cite="paul2019,lim2021"></span>. <b>Inductive</b>: codes emerge from the texts, then are grouped into first-order concepts, second-order themes and aggregate dimensions <span data-cite="gioia2013"></span>.</p></article>
+      <article class="learn"><h3>3. Concept matrix</h3><p>A study × concept table makes synthesis concept-centric rather than author-centric <span data-cite="webster2002"></span>. Read down a column to write about a concept across studies.</p></article>
+      <article class="learn"><h3>4. Thematic synthesis</h3><p>Three stages: line-by-line coding, descriptive themes, analytical themes that go beyond the original studies <span data-cite="thomas2008"></span>. For conflicting quantitative results without pooling, follow SWiM <span data-cite="campbell2020"></span>.</p></article>
+      <article class="learn"><h3>5. Bibliometric analysis</h3><p><b>Performance analysis</b>: productivity and impact of authors, sources, countries. <b>Science mapping</b>: co-citation, bibliographic coupling, co-word and co-authorship networks <span data-cite="donthu2021,zupic2015"></span>. Interpret clusters by reading their core papers.</p></article>
+      <article class="learn"><h3>6. Quality appraisal</h3><p>Match the tool to the design: RoB 2 (randomised trials), ROBINS-I (non-randomised), CASP and JBI (qualitative), MMAT (mixed sets), AMSTAR 2 (for reviews in umbrella reviews) <span data-cite="sterne2019,sterne2016,hong2018,shea2017"></span>.</p></article>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>Example concept matrix</h3></div>
+      <div class="table-wrap"><table class="mini cmatrix" id="cmatrix"></table></div>
+      <p class="hint">Illustrative studies. Select a concept column header to see how a column turns into an analytical sentence.</p>
+      <p class="lesson" id="cmatrixOut"></p>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>3D science map: co-word analysis (illustrative)</h3></div>
+      <p>Each sphere is a keyword (size = frequency), links show how often keywords appear together, and colours show clusters found by the mapping algorithm. This example models a literature on <i>Industry 4.0, digital twins and sustainability performance</i>. Drag to rotate; select a keyword to see its strongest links.</p>
+      <div class="map-grid">
+        <div class="stage3d stage-map" id="mapStage" role="img" aria-label="Rotating 3D network of 28 keywords in four clusters; details for the selected keyword are shown next to it."></div>
+        <div class="map-side">
+          <fieldset class="map-cl"><legend>Clusters</legend><div id="mapClusters"></div></fieldset>
+          <label class="field-inline">Colour by <select id="mapColor"><option value="cluster">Cluster</option><option value="year">Average publication year</option></select></label>
+          <label class="field-inline">Keyword <select id="mapKey"></select></label>
+          <p class="map-info" id="mapInfo" aria-live="polite">Select a keyword.</p>
+          <p class="hint">How to read it: closeness and links mean co-occurrence, not causation. Clusters are themes to be named and interpreted by reading their core papers <span data-cite="vaneck2010,aria2017"></span>. Colouring by year reveals emerging topics (warm colours are recent).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-h"><h3>Screening agreement: Cohen's kappa (Python)</h3></div>
+      <p>Two reviewers screen the same 20 abstracts. Toggle reviewer B's decisions and see how agreement changes. Kappa corrects raw agreement for chance <span data-cite="landis1977"></span>.</p>
+      <div class="kappa" id="kappaGrid"></div>
+      <p class="lesson" id="kappaOut"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ TOOLS -->
+<section id="tools" class="sec sec-alt">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">10 · Tools</p><h2>Tools for each stage</h2>
+      <p class="sub">Most stages can be done with free tools. Whatever you use, record versions and settings so the review can be reproduced.</p></header>
+    <div class="table-wrap"><table class="mini tools" id="toolsTable"></table></div>
+    <p class="note-box"><b>On AI tools.</b> Machine-learning prioritisation for screening is well established when the stopping rule is reported <span data-cite="vandeschoot2021"></span>. Generative AI can help with brainstorming search terms and drafting, but it can invent references and misread studies: verify everything against the source and disclose its use according to your institution's and journal's policy.</p>
+  </div>
+</section>
+
+<!-- ================================================================ PYTHON -->
+<section id="python" class="sec sec-dark">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">11 · Python lab</p><h2>Run the review engine yourself</h2>
+      <p class="sub">The same <code>review_lab.py</code> engine that powers this site runs here in CPython compiled to WebAssembly (Pyodide). Edit the code and run it; nothing leaves your browser. The engine's results for the BCG trials match the reference implementation in R's metafor <span data-cite="viechtbauer2010"></span>.</p></header>
+    <div class="py-status" data-py-status><span class="dot"></span><span class="txt"></span><button type="button" class="btn btn-small" data-py-load>Load Python engine</button></div>
+    <div class="console">
+      <div class="console-bar"><label class="field-inline">Example <select id="pyExample"></select></label><button type="button" class="btn btn-primary btn-small" id="pyRun">Run ▸</button><span class="hint">Ctrl + Enter also runs</span></div>
+      <label for="pyCode" class="sr-only">Python code</label>
+      <textarea id="pyCode" class="code-edit" spellcheck="false" rows="16"></textarea>
+      <pre id="pyOut" class="code-out" aria-live="polite" tabindex="0"></pre>
+    </div>
+    <p class="hint">Download the engine: <a href="py/review_lab.py" download>review_lab.py</a> (standard library only; runs with any Python 3.8+). Tests: <a href="tests/test_review_lab.py">tests/test_review_lab.py</a>.</p>
+  </div>
+</section>
+
+<!-- ================================================================ VIDEO -->
+<section id="video" class="sec">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">12 · Video</p><h2>Literature reviews in 90 seconds</h2>
+      <p class="sub">What a literature review is, why you need one, the main types, how a systematic review and a meta-analysis are done, and how to write synthesis.</p></header>
+    <div class="video-grid">
+      <div class="video-frame"><video id="lrVideo" controls preload="metadata" playsinline poster="video/poster.jpg"><source src="video/literature-review-explained-90s.mp4" type="video/mp4"><track kind="captions" src="video/captions.vtt" srclang="en" label="English">Your browser cannot play the video; use the download link.</video></div>
+      <div class="video-side">
+        <a class="btn btn-primary" href="video/literature-review-explained-90s.mp4" download="LiteratureReview-Explained-90s.mp4">Download video (MP4)</a>
+        <a class="btn" href="video/narration.mp3" download>Download narration (MP3)</a>
+        <a class="btn" href="video/narration-script.md">Script with timestamps</a>
+        <details class="transcript"><summary>Transcript</summary><div id="transcript"></div></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ REFERENCES -->
+<section id="references" class="sec sec-alt">
+  <div class="wrap">
+    <header class="sec-h"><p class="kicker">13 · Sources</p><h2>References</h2>
+      <p class="sub">APA 7th edition. Every in-text citation on this page links here.</p></header>
+    <ol class="refs" id="refList"></ol>
+    <div class="cite-this"><h3>Cite this resource</h3><p id="citeThis"></p></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot"><div class="wrap">
+  <p><b>Review Lab</b> · an open teaching resource on literature reviews, systematic reviews and meta-analysis. Built with HTML, JavaScript, three.js (MIT) and Pyodide (MPL 2.0); Python engine with the standard library only. Fonts: Bricolage Grotesque, Source Serif 4, Atkinson Hyperlegible, JetBrains Mono (SIL OFL). Narration voice: Kokoro-82M (Apache 2.0).</p>
+  <p>Illustrative datasets are labelled as such. The BCG data are from <a class="cite" href="#ref-colditz1994">Colditz et al. (1994)</a>. <a href="https://github.com/Rajan56/LiteratureReview-Explained">Source code on GitHub</a></p>
+</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<noscript><p class="noscript">The simulations need JavaScript. The explanatory text and references remain readable.</p></noscript>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
